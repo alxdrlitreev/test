@@ -3,49 +3,6 @@ name: build
 on: [push]
 
 jobs:
-  build-bin-local:
-    strategy:
-      matrix:
-        os: [macos-latest]
-        include:
-          - os: macos-latest
-            target: x86_64-apple-darwin
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-
-      - name: update submodule
-        run: |
-          git submodule init && git submodule update
-      - name: show last commit
-        run: |
-          git show --summary
-      - name: install rust toolchain
-        uses: hecrj/setup-rust-action@v1
-        with:
-          rust-version: nightly
-
-      - name: install llvm
-        if: ${{ matrix.os == 'macos-latest' }}
-        run: |
-          brew update && brew install llvm
-      - name: build
-        run: |
-          cargo build --release --target ${{ matrix.target }} -p tun2socks-bin
-      - name: rename artifacts
-        run: |
-          mv target/${{ matrix.target }}/release/tun2socks tun2socks-${{ matrix.target }}
-      - name: upload assets
-        uses: actions/upload-artifact@v2
-        with:
-          name: tun2socks-${{ matrix.target }}
-          path: tun2socks-${{ matrix.target }}
-
   build-lib-ios:
     runs-on: macos-latest
 
